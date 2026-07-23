@@ -4,6 +4,8 @@ Authenticated users create contract-valid, expiring device commands only after a
 
 Device command-result envelopes are validated and bound to the EMQX-authenticated topic device. Result `messageId` values are unique, so repeated delivery is idempotent. Commands, outbox state, device results, and transition history remain authoritative across service restarts. In-memory storage is an explicitly injected test adapter only.
 
+The broker transport requires `mqtts` plus a separately scoped `algaguard-command-service` client certificate. Username/password MQTT transport is not accepted; the service private key is supplied only as a runtime file mount and is never logged.
+
 ```sh
 npm ci
 npm run migrate

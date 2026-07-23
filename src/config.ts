@@ -6,7 +6,9 @@ const environmentSchema = z.object({
     .default("development"),
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   DATABASE_URL: z.string().min(1),
-  REDIS_URL: z.string().url(),
+  MQTT_URL: z.string().url(),
+  MQTT_USERNAME: z.string().min(1),
+  MQTT_PASSWORD: z.string().min(1),
   LOG_LEVEL: z
     .enum(["fatal", "error", "warn", "info", "debug", "trace"])
     .default("info"),

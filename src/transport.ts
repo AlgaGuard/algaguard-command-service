@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { readFile } from "node:fs/promises";
 import mqtt, { type MqttClient } from "mqtt";
 import { z } from "zod";
 import type {
@@ -7,6 +8,7 @@ import type {
   CommandRepository,
   DeviceResult,
 } from "./domain.js";
+import type { ServiceConfig } from "./config.js";
 
 const errorDetail = z
   .object({
@@ -57,20 +59,28 @@ export class MqttCommandTransport implements CommandPublisher {
     private readonly repository: CommandRepository,
   ) {}
 
-  static async connect(repository: CommandRepository) {
-    const url = process.env.MQTT_URL;
-    const username = process.env.MQTT_USERNAME;
-    const password = process.env.MQTT_PASSWORD;
-    if (!url || !username || !password)
-      throw new Error(
-        "MQTT_URL, MQTT_USERNAME, and MQTT_PASSWORD are required",
-      );
-    const client = await mqtt.connectAsync(url, {
-      clientId: `algaguard-command-${randomUUID()}`,
-      username,
-      password,
-      clean: true,
-      reconnectPeriod: 2_000,
+  static async connect(repository: CommandRepository, config: ServiceConfig) {
+    const [ca, cert, key] = await Promise.all([
+      readFile(config.MQTT_CA_PATH),
+      readFile(config.MQTT_CERTIFICATE_PATH),
+      readFile(config.MQTT_PRIVATE_KEY_PATH),
+    ]);
+    const client = await mqtt.connectAsync(config.MQTT_URL, {
+      clientId: config.MQTT_CLIENT_ID,
+      ca,
+      cert,
+      key,
+      servername: config.MQTT_SERVER_NAME,
+      rejectUnauthorized: true,
+      protocolVersion: 5,
+      clean: false,
+      keepalive: config.MQTT_KEEPALIVE_SECONDS,
+      reconnectPeriod: config.MQTT_RECONNECT_DELAY_MS,
+      queueQoSZero: false,
+      properties: {
+        receiveMaximum: config.MQTT_QOS1_INFLIGHT,
+        sessionExpiryInterval: config.MQTT_SESSION_EXPIRY_SECONDS,
+      },
     });
     const transport = new MqttCommandTransport(client, repository);
     await client.subscribeAsync("algaguard/v1/devices/+/command-results", {

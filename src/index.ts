@@ -8,7 +8,7 @@ import { MqttCommandTransport } from "./transport.js";
 
 const config = loadConfig();
 const repository = new PostgresCommandRepository(createPostgresPool(config));
-const transport = await MqttCommandTransport.connect(repository);
+const transport = await MqttCommandTransport.connect(repository, config);
 const worker = new CommandWorker(repository, transport);
 const workerTimer = setInterval(() => void worker.runOnce(), 250);
 workerTimer.unref();

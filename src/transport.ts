@@ -145,7 +145,10 @@ export class MqttCommandTransport implements CommandPublisher {
     await this.client.publishAsync(
       `algaguard/v1/devices/${command.deviceId}/commands`,
       JSON.stringify({
-        schema: "urn:algaguard:schema:mqtt:command:v1",
+        schema:
+          command.commandType === "REQUEST_PHYSICAL_UNPAIR"
+            ? "urn:algaguard:schema:mqtt:physical-unpair-command:v1"
+            : "urn:algaguard:schema:mqtt:command:v1",
         schemaVersion: "1.0.0",
         messageId: randomUUID(),
         deviceId: command.deviceId,

@@ -6,7 +6,8 @@ export type CommandType =
   | "APPLY_PROFILE_CONFIGURATION"
   | "SYNC_TIME"
   | "REBOOT"
-  | "PREPARE_OTA";
+  | "PREPARE_OTA"
+  | "REQUEST_PHYSICAL_UNPAIR";
 export type CommandStatus =
   | "QUEUED"
   | "RECEIVED"

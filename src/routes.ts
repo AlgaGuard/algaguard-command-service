@@ -24,6 +24,12 @@ const commandInput = z.discriminatedUnion("commandType", [
   }),
   z.object({
     commandId: z.string().uuid(),
+    commandType: z.literal("REQUEST_PHYSICAL_UNPAIR"),
+    expiresAt: z.string().datetime(),
+    parameters: empty,
+  }),
+  z.object({
+    commandId: z.string().uuid(),
     commandType: z.literal("SET_INDICATOR_STATE"),
     expiresAt: z.string().datetime(),
     parameters: z

@@ -161,7 +161,20 @@ export class MqttCommandTransport implements CommandPublisher {
           correlationId: command.correlationId,
         },
       }),
-      { qos: 1, retain: false },
+      // APPLY_PROFILE_CONFIGURATION represents the device's current desired
+      // state, not a one-shot event -- retain it so a device that reconnects
+      // (including after a reboot, which drops the in-memory profileInstalled
+      // flag entirely) receives it immediately on subscribe instead of
+      // depending on catching the original publish while briefly online.
+      // Every other command type stays non-retained: replaying e.g.
+      // SYNC_TIME or PREPARE_OTA on every reconnect would be wrong. Retained
+      // messages persist per-topic until overwritten by a later retained
+      // publish, so this doesn't get clobbered by non-retained commands sent
+      // in between.
+      {
+        qos: 1,
+        retain: command.commandType === "APPLY_PROFILE_CONFIGURATION",
+      },
     );
   }
 

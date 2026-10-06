@@ -5,6 +5,11 @@ const environmentSchema = z.object({
     .enum(["development", "test", "production"])
     .default("development"),
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),
+  GRPC_PORT: z.coerce.number().int().min(1).max(65535).default(50051),
+  ACCESS_SERVICE_GRPC_ADDRESS: z
+    .string()
+    .min(1)
+    .default("access-service:50051"),
   DATABASE_URL: z.string().min(1),
   MQTT_URL: z.string().url().startsWith("mqtts://"),
   MQTT_CLIENT_ID: z

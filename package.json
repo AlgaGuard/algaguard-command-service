@@ -21,6 +21,8 @@
     "check": "npm run format:check && npm run lint && npm run contract:check && npm test && npm run build"
   },
   "dependencies": {
+    "@grpc/grpc-js": "^1.14.5",
+    "@grpc/proto-loader": "^0.8.1",
     "@opentelemetry/api": "^1.9.0",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
